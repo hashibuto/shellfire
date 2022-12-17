@@ -50,7 +50,7 @@ func generateStripe(n artillery.Namespace, p *artillery.Processor) error {
 		return fmt.Errorf("Aligment bytes must be fewer than the total buffer length")
 	}
 
-	size := args.Offset + 8 + args.Align
+	size := args.Offset + 4 + args.Align
 	buffer := make([]byte, size)
 	for i := 0; i < args.Align; i++ {
 		buffer[i] = 0xFF
@@ -70,7 +70,7 @@ func generateStripe(n artillery.Namespace, p *artillery.Processor) error {
 		offset++
 	}
 
-	for i := 0; i < 8; i++ {
+	for i := 0; i < 4; i++ {
 		buffer[args.Offset+i] = 'A'
 	}
 	for _, char := range buffer[:args.Offset+8] {

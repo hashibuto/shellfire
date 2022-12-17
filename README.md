@@ -3,7 +3,7 @@ Buffer overflow swiss army knife
 
 ## Get it
 ```
-wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.5/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
+wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.6/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
 ```
 
 
@@ -27,7 +27,7 @@ Create a pattern with fixed bytes
 
 Determine the offset of a sub-pattern (4 bytes)
 
-`shellfire pattern offset [-f=int] <pattern>`
+`shellfire pattern offset [-h] [-f=int] <pattern>`
 
 ```
 > shellfire pattern offset LMMM
