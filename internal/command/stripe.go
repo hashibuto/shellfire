@@ -73,7 +73,7 @@ func generateStripe(n artillery.Namespace, p *artillery.Processor) error {
 	for i := 0; i < 4; i++ {
 		buffer[args.Offset+i] = 'A'
 	}
-	for _, char := range buffer[:args.Offset+8] {
+	for _, char := range buffer[:args.Offset+4] {
 		if args.Hex {
 			fmt.Printf("\\x%02x", char)
 		} else {
