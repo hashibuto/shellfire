@@ -3,7 +3,7 @@ Buffer overflow swiss army knife
 
 ## Get it
 ```
-wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.4/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
+wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.5/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
 ```
 
 
