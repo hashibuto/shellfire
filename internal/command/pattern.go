@@ -172,10 +172,11 @@ func calculateOffset(ns artillery.Namespace, processor *artillery.Processor) err
 		if i >= 4 {
 			testStr := string(seq[i-4 : i])
 			if pattern == testStr {
+				foundAt := i - 4
 				if args.Hex {
-					fmt.Printf("\\x%08x\n", i+args.Fixed)
+					fmt.Printf("\\x%08x\n", foundAt+args.Fixed)
 				} else {
-					fmt.Printf("%d\n", i+args.Fixed)
+					fmt.Printf("%d\n", foundAt+args.Fixed)
 				}
 				return nil
 			}
