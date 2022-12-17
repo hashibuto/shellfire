@@ -1,6 +1,12 @@
 # shellfire
 Buffer overflow analysis swiss army knife
 
+## Get it
+```
+wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.0/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
+```
+
+
 ## Buffer overflow return address pattern tool
 
 Create a pattern of n bytes
