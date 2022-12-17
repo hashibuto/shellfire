@@ -36,10 +36,13 @@ Determine the offset of a sub-pattern (4 bytes)
 
 Produce a shellcode payload
 
-`shellfire payload [-h] [-n=int] <offset> <returncode> <shellcode>`
+`shellfire payload [-hb] [-n=int] <offset> <returncode> <shellcode>`
 
 ```
 > shellfire payload 128 \x33\x23\x23\x55 \x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55`
 ```
 
-Because the output is binary, it may not be visible in the terminal.  Use the `-h` flag to output as a hex encoded string.  Use `-n` to specify nopsled length - by default it will account for half the remaining buffer space after the shellcode.
+Because the output is binary, it may not be visible in the terminal.  
+Use the `-h` flag to output as a hex encoded string.  
+Use `-n` to specify nopsled length - by default it will account for half the remaining buffer space after the shellcode.  
+Use `-b` to specify big-endian byte order (this will preserve the return address order instead of reversing it).

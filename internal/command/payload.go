@@ -40,6 +40,13 @@ var PayloadCommand = &artillery.Command{
 			Type:        artillery.Bool,
 			Value:       true,
 		},
+		{
+			Name:        "big",
+			ShortName:   'b',
+			Description: "specify big-endian byte order",
+			Type:        artillery.Bool,
+			Value:       true,
+		},
 	},
 	OnExecute: makePayload,
 }
@@ -47,6 +54,7 @@ var PayloadCommand = &artillery.Command{
 // makePayload generates a buffer payload containingthe provided shellcode
 func makePayload(n artillery.Namespace, p *artillery.Processor) error {
 	var args struct {
+		Big           bool
 		Hex           bool
 		Nsb           int
 		Offset        int
@@ -100,9 +108,16 @@ func makePayload(n artillery.Namespace, p *artillery.Processor) error {
 		offset++
 	}
 
-	for i := 0; i < len(returnAddressBytes); i++ {
-		buffer[offset] = returnAddressBytes[i]
-		offset++
+	if args.Big {
+		for i := 0; i < len(returnAddressBytes); i++ {
+			buffer[offset] = returnAddressBytes[i]
+			offset++
+		}
+	} else {
+		for i := len(returnAddressBytes) - 1; i >= 0; i-- {
+			buffer[offset] = returnAddressBytes[i]
+			offset++
+		}
 	}
 
 	for i := 0; i < len(buffer); i++ {
