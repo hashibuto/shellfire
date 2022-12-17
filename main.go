@@ -23,6 +23,7 @@ func main() {
 
 	commands := []*artillery.Command{
 		command.PatternCommand,
+		command.PayloadCommand,
 		command.VersionCommand,
 	}
 

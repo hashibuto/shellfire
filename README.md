@@ -33,3 +33,13 @@ Determine the offset of a sub-pattern (4 bytes)
 > shellfire pattern offset LMMM
 91
 ```
+
+Produce a shellcode payload
+
+`shellfire payload [-h] <offset> <returncode> <shellcode>`
+
+```
+> shellfire payload 128 \x33\x23\x23\x55 \x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55`
+```
+
+Because the output is binary, it may not be visible in the terminal.  Use the `-h` flag to output as a hex encoded string.

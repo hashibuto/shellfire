@@ -31,6 +31,12 @@ var PatternCommand = &artillery.Command{
 					Description: "fixed portion of pattern for extra large buffers",
 					Type:        artillery.Int,
 				},
+				{
+					Name:        "char",
+					ShortName:   'c',
+					Description: "character to use for fixed portion of pattern",
+					Type:        artillery.String,
+				},
 			},
 			OnExecute: generateBytes,
 		},
@@ -93,6 +99,7 @@ func (iter *Iter) Next() byte {
 // the true offset can be determined by inspecting a minimum of 4 consecutive bytes
 func generateBytes(ns artillery.Namespace, processor *artillery.Processor) error {
 	var args struct {
+		Char   string
 		Fixed  int
 		Length int
 	}
@@ -109,11 +116,17 @@ func generateBytes(ns artillery.Namespace, processor *artillery.Processor) error
 		return fmt.Errorf("Fixed number of bytes must be reasonably smaller than the total pattern size")
 	}
 
+	if len(args.Char) > 1 {
+		return fmt.Errorf("Fixed character must be exactly one character long")
+	} else {
+		args.Char = "="
+	}
+
 	for i := 0; i < args.Fixed; i++ {
-		fmt.Printf("=")
+		fmt.Printf("%s", args.Char)
 	}
 	seq := generateByteSeq(args.Length - args.Fixed)
-	fmt.Println(string(seq))
+	fmt.Print(string(seq))
 	return nil
 }
 
