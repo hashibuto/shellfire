@@ -3,7 +3,7 @@ Buffer overflow swiss army knife
 
 ## Get it
 ```
-wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.2/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
+wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.3/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
 ```
 
 
@@ -34,7 +34,7 @@ Determine the offset of a sub-pattern (4 bytes)
 91
 ```
 
-Produce a shellcode payload
+## Produce a shellcode payload
 
 `shellfire payload [-hb] [-n=int] <offset> <returncode> <shellcode>`
 
@@ -46,3 +46,14 @@ Because the output is binary, it may not be visible in the terminal.
 Use the `-h` flag to output as a hex encoded string.  
 Use `-n` to specify nopsled length - by default it will account for half the remaining buffer space after the shellcode.  
 Use `-b` to specify big-endian byte order (this will preserve the return address order instead of reversing it).
+
+
+## Produce a ramp for buffer inspection
+This generates a visually inspectable sequence of bytes which should be easy to follow in a debugger, giving you a rough indication of position.  It's less of a scientific tool and more of a general awareness tool.
+
+`shellfire ramp [-h] [-a=int] <length>`
+```
+> shellfire ramp 128
+```
+Use the `-h` flag to output as a hex encoded string
+Use the `-a` flag to specify a number of alignment bytes to prepend to the buffer
