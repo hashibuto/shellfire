@@ -1,5 +1,5 @@
 # shellfire
-Buffer overflow analysis swiss army knife
+Buffer overflow swiss army knife
 
 ## Get it
 ```
