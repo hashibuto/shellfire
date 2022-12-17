@@ -36,7 +36,7 @@ Determine the offset of a sub-pattern (4 bytes)
 
 Produce a shellcode payload
 
-`shellfire payload [-h] [-n] <offset> <returncode> <shellcode>`
+`shellfire payload [-h] [-n=int] <offset> <returncode> <shellcode>`
 
 ```
 > shellfire payload 128 \x33\x23\x23\x55 \x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55`
