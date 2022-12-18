@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/hashibuto/artillery"
 )
@@ -126,15 +127,13 @@ func makePayload(n artillery.Namespace, p *artillery.Processor) error {
 		}
 	}
 
-	for i := 0; i < len(buffer); i++ {
-		if args.Hex {
-			fmt.Printf("\\x%02x", buffer[i])
-		} else {
-			fmt.Printf("%c", buffer[i])
-		}
-	}
 	if args.Hex {
+		for i := 0; i < len(buffer); i++ {
+			fmt.Printf("\\x%02x", buffer[i])
+		}
 		fmt.Println()
+	} else {
+		os.Stdout.Write(buffer)
 	}
 
 	return nil
