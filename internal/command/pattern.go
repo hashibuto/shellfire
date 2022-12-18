@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashibuto/artillery"
+	"github.com/hashibuto/shellfire/internal/utils"
 )
 
 var baseChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWZYZabcdefghijklmnopqrstuvwxyz"
@@ -129,11 +130,9 @@ func generateBytes(ns artillery.Namespace, processor *artillery.Processor) error
 		args.Char = "="
 	}
 
-	for i := 0; i < args.Fixed; i++ {
-		fmt.Printf("%s", args.Char)
-	}
+	utils.WriteValue(args.Fixed, args.Char[0], false)
 	seq := generateByteSeq(args.Length - args.Fixed)
-	fmt.Print(string(seq))
+	utils.Write(seq, false)
 	return nil
 }
 

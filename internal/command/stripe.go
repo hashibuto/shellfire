@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashibuto/artillery"
+	"github.com/hashibuto/shellfire/internal/utils"
 )
 
 var StripeCommand = &artillery.Command{
@@ -73,17 +74,7 @@ func generateStripe(n artillery.Namespace, p *artillery.Processor) error {
 	for i := 0; i < 4; i++ {
 		buffer[args.Offset+i] = 'A'
 	}
-	for _, char := range buffer[:args.Offset+4] {
-		if args.Hex {
-			fmt.Printf("\\x%02x", char)
-		} else {
-			fmt.Printf("%c", char)
-		}
-	}
-
-	if args.Hex {
-		fmt.Println()
-	}
+	utils.Write(buffer[:args.Offset+4], args.Hex)
 
 	return nil
 }

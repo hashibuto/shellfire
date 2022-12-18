@@ -2,9 +2,9 @@ package command
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/hashibuto/artillery"
+	"github.com/hashibuto/shellfire/internal/utils"
 )
 
 var malformedHexStringErr = fmt.Errorf("Malformed hex string, should take the following form \\xed\\x32\\x44\\x55")
@@ -127,15 +127,7 @@ func makePayload(n artillery.Namespace, p *artillery.Processor) error {
 		}
 	}
 
-	if args.Hex {
-		for i := 0; i < len(buffer); i++ {
-			fmt.Printf("\\x%02x", buffer[i])
-		}
-		fmt.Println()
-	} else {
-		os.Stdout.Write(buffer)
-	}
-
+	utils.Write(buffer, args.Hex)
 	return nil
 }
 
