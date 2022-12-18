@@ -64,3 +64,4 @@ Use the `-a` flag to specify a number of alignment bytes to prepend to the buffe
 > shellfire eval -d "0x1FAD + 222"
 \x0000208b
 ```
+Use the `-d` option to switch output to unpadded decimal if that's useful.  Currently only `+` and `-` operators are supported.  Expression can contain hexadecimal and decimal (mixed) but all hexadecimal must be disambiguated by providing `\x` or `0x` as a prefix.
