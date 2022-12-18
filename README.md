@@ -3,7 +3,7 @@ Buffer overflow swiss army knife
 
 ## Get it
 ```
-wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.10/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
+wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.11/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
 ```
 
 
@@ -57,3 +57,10 @@ This generates a visually inspectable sequence of bytes which should be easy to 
 ```
 Use the `-h` flag to output as a hex encoded string
 Use the `-a` flag to specify a number of alignment bytes to prepend to the buffer
+
+# Evaluate simple arithmatic expressions
+`shellfire eval [-d] <expression>`
+```
+> shellfire eval -d "0x1FAD + 222"
+\x0000208b
+```
