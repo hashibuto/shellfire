@@ -1,7 +1,7 @@
 # shellfire
 Buffer overflow swiss army knife
 
-## Get it
+## Get the CLI tool binary
 ```
 wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.13/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
 ```
