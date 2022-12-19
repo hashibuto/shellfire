@@ -3,7 +3,7 @@ Buffer overflow swiss army knife
 
 ## Get it
 ```
-wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.11/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
+wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/v0.1.12/shellfire && chmod +x /tmp/shellfire && sudo mv -f /tmp/shellfire /usr/local/bin/shellfire
 ```
 
 
@@ -36,7 +36,7 @@ Determine the offset of a sub-pattern (4 bytes)
 
 ## Produce a shellcode payload
 
-`shellfire payload [-hb] [-n=int] <offset> <returncode> <shellcode>`
+`shellfire payload [-hba] [-n=int] <offset> <returncode> <shellcode>`
 
 ```
 > shellfire payload 128 \x33\x23\x23\x55 \x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55\x33\x23\x23\x55`
@@ -45,15 +45,17 @@ Determine the offset of a sub-pattern (4 bytes)
 Because the output is binary, it may not be visible in the terminal.  
 Use the `-h` flag to output as a hex encoded string.  
 Use `-n` to specify nopsled length - by default it will account for half the remaining buffer space after the shellcode.  
-Use `-b` to specify big-endian byte order (this will preserve the return address order instead of reversing it).
+Use `-b` to specify big-endian byte order (this will preserve the return address order instead of reversing it).  
+Use `-a` to append shellcode after the return address instead of inserting it into the buffer
 
 
 ## Produce a stripe pattern for buffer inspection
 This generates a visually inspectable sequence of bytes which should be easy to follow in a debugger, giving you a rough indication of position.
 
-`shellfire stripe [-h] [-a=int] <length>`
+`shellfire stripe [-h] [-a=int] [-e=int] <length>`
 ```
-> shellfire stripe 128
+> shellfire stripe 64
+DDDDUUUUDDDDUUUUDDDDUUUUDDDDUUUUDDDDUUUUDDDDUUUUDDDDUUUUDDDDUUUUwwww
 ```
 Use the `-h` flag to output as a hex encoded string
 Use the `-a` flag to specify a number of alignment bytes to prepend to the buffer

