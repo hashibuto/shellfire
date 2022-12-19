@@ -22,6 +22,13 @@ func NewBuffer(length int, init byte) *Buffer {
 	}
 }
 
+// FromByteArray creates a new buffer from a byte array
+func FromByteArray(b []byte) *Buffer {
+	buf := NewBuffer(len(b), 0)
+	buf.CopyTo(b, 0)
+	return buf
+}
+
 // String returns a string representation of the buffer
 func (buffer *Buffer) String() string {
 	return string(buffer.buffer)

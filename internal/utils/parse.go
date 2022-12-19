@@ -38,3 +38,17 @@ func ParseNumber(number string) (int, error) {
 
 	return value, nil
 }
+
+// IsHexString returns true if the input is a hex string
+func IsHexString(number string) bool {
+	lower := strings.ToLower(number)
+	if strings.HasPrefix(lower, "0x") || strings.HasPrefix(lower, "\\x") && len(lower) >= 3 {
+		for i := 2; i < len(lower); i++ {
+			if (!(lower[i] >= 48 && lower[i] <= 57)) && !(lower[i] >= 97 && lower[i] <= 102) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}

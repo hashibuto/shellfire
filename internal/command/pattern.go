@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashibuto/artillery"
 	"github.com/hashibuto/shellfire/internal/buffer"
+	"github.com/hashibuto/shellfire/internal/utils"
 )
 
 var baseChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWZYZabcdefghijklmnopqrstuvwxyz"
@@ -35,7 +36,7 @@ var PatternCommand = &artillery.Command{
 				{
 					Name:        "char",
 					ShortName:   'c',
-					Description: "character to use for fixed portion of pattern",
+					Description: "character to use for fixed portion of pattern (single character or hex value)",
 					Type:        artillery.String,
 				},
 			},
@@ -124,10 +125,20 @@ func generateBytes(ns artillery.Namespace, processor *artillery.Processor) error
 		return fmt.Errorf("Fixed number of bytes must be reasonably smaller than the total pattern size")
 	}
 
-	if len(args.Char) > 1 {
-		return fmt.Errorf("Fixed character must be exactly one character long")
-	} else {
+	if len(args.Char) == 0 {
 		args.Char = "="
+	}
+
+	if utils.IsHexString(args.Char) {
+		num, _ := utils.ParseNumber(args.Char)
+		if num > 255 {
+			return fmt.Errorf("Fixed character out of single byte range")
+		}
+		args.Char = string(byte(num))
+	}
+
+	if len(args.Char) > 1 {
+		return fmt.Errorf("Fixed character must be a single character long, or a hex representation of a single byte")
 	}
 
 	b := generateByteSeq(args.Fixed, args.Length, args.Char[0])
