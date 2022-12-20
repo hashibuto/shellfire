@@ -52,3 +52,40 @@ func IsHexString(number string) bool {
 	}
 	return false
 }
+
+// ParseHexArrayString returns a byte array from the input hex string (taking the strict but case insensitive form "\xff...\xff")
+func ParseHexArrayString(value string) ([]byte, error) {
+	if len(value)%4 != 0 {
+		return nil, fmt.Errorf("Length should be a multiple of 4")
+	}
+	value = strings.ToLower(value)
+
+	ret := make([]byte, len(value)/4)
+	pos := 0
+	for i := 0; i < len(value); i += 4 {
+		subStr := value[i : i+4]
+		if subStr[0] != '\\' || subStr[1] != 'x' {
+			return nil, fmt.Errorf("Byte \"%s\" is incorrect, hex bytes take the form \\xff", subStr)
+		}
+		var total byte
+		for j := 0; j < 2; j++ {
+			offset := 2 + j
+			scale := 4
+			if j == 1 {
+				scale = 0
+			}
+			if subStr[offset] >= 48 && subStr[offset] <= 57 {
+				total += (subStr[offset] - 48) << scale
+			} else if subStr[offset] >= 97 && subStr[2] <= 102 {
+				total += (subStr[offset] - 97 + 10) << scale
+			} else {
+				return nil, fmt.Errorf("Invalid character \"%c\" at offset %d", subStr[offset], i+j)
+			}
+		}
+
+		ret[pos] = total
+		pos++
+	}
+
+	return ret, nil
+}

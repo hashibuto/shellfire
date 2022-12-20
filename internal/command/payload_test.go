@@ -1,22 +1,27 @@
 package command
 
-import "testing"
+import (
+	"testing"
 
-func TestParseHexString(t *testing.T) {
-	input := "\\x03\\xF1\\Xfa"
-	output, err := parseHexString(input)
+	"github.com/hashibuto/shellfire/internal/buffer"
+	"github.com/hashibuto/shellfire/internal/utils"
+)
+
+func TestBuildPayload(t *testing.T) {
+	PayloadCommand.Prepare()
+	stdout, err := utils.CaptureStdout(func() error {
+		return PayloadCommand.Process([]string{"10", "\\x33\\x34\\x35\\x36", "\\x01\\x02\\x03\\x04\\x05\\x06"})
+	})
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	if len(output) != 3 {
-		t.Errorf("Expected an output length of 3 bytes")
-		return
-	}
-
-	if output[0] != 3 || output[1] != 241 || output[2] != 250 {
-		t.Errorf("Output did not match input")
+	b := buffer.FromByteArray(stdout)
+	actual := b.HexString()
+	expected := "\\x90\\x90\\x01\\x02\\x03\\x04\\x05\\x06\\x90\\x90\\x36\\x35\\x34\\x33"
+	if actual != expected {
+		t.Errorf("Expected:\n%s\nDid not match actual\n%s\n", expected, actual)
 		return
 	}
 }

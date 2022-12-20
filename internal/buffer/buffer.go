@@ -3,6 +3,7 @@ package buffer
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 type Buffer struct {
@@ -90,30 +91,27 @@ func (buffer *Buffer) RevCopyTo(source []byte, destOffset int) {
 	}
 }
 
-// HexOut writes data in hex string format to the stdout
-func (buffer *Buffer) HexOut() {
+// HexString writes data in hex string format to the stdout
+func (buffer *Buffer) HexString() string {
+	strs := []string{}
 	for i := 0; i < buffer.length; i++ {
-		_, err := fmt.Printf("\\x%02x", buffer.buffer[i])
-		if err != nil {
-			panic(err)
-		}
+		strs = append(strs, fmt.Sprintf("\\x%02x", buffer.buffer[i]))
 	}
+
+	return strings.Join(strs, "")
 }
 
-// BinOut writes binary data to the stdout
-func (buffer *Buffer) BinOut() {
-	_, err := os.Stdout.Write(buffer.buffer)
-	if err != nil {
-		panic(err)
-	}
+// Bytes writes binary data to the stdout
+func (buffer *Buffer) Bytes() []byte {
+	return buffer.buffer
 }
 
 // Write sends either bin or hex string data to the stdout
 func (buffer *Buffer) Stdout(hex bool) {
 	if hex {
-		buffer.HexOut()
+		fmt.Printf("%s", buffer.HexString())
 	} else {
-		buffer.BinOut()
+		os.Stdout.Write(buffer.buffer)
 	}
 }
 
