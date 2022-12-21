@@ -101,12 +101,24 @@ func (buffer *Buffer) HexString() string {
 	return strings.Join(strs, "")
 }
 
+// SafeString returns a string with only printable characters
+func (buffer *Buffer) SafeString() string {
+	clone := buffer.buffer[:]
+	for i := 0; i < len(clone); i++ {
+		char := clone[i]
+		if char < 33 || char > 126 {
+			clone[i] = ' '
+		}
+	}
+	return string(clone)
+}
+
 // Bytes writes binary data to the stdout
 func (buffer *Buffer) Bytes() []byte {
 	return buffer.buffer
 }
 
-// Write sends either bin or hex string data to the stdout
+// Stdout sends either bin or hex string data to the stdout
 func (buffer *Buffer) Stdout(hex bool) {
 	if hex {
 		fmt.Printf("%s", buffer.HexString())

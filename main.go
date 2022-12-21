@@ -22,7 +22,9 @@ func main() {
 	processor.RemoveBuiltins(false)
 
 	commands := []*artillery.Command{
+		command.StrEncodeCommand,
 		command.EvalCommand,
+		command.ExecCommand,
 		command.PatternCommand,
 		command.PayloadCommand,
 		command.StripeCommand,
