@@ -67,3 +67,15 @@ Use the `-a` flag to specify a number of alignment bytes to prepend to the buffe
 \x0000208b
 ```
 Use the `-d` option to switch output to unpadded decimal if that's useful.  Currently only `+` and `-` operators are supported.  Expression can contain hexadecimal and decimal (mixed) but all hexadecimal must be disambiguated by providing `\x` or `0x` as a prefix.
+
+## Produce a hex representation of a string for register packing
+`
+shellfire strencode [-s] <string>
+`
+```
+> shellfire strencode /home/user/some/filename.txt
+0x2f686f6d652f7573    // "/home/us"
+0x65722f736f6d652f    // "er/some/"
+0x66696c656e616d65    // "filename"
+0x2e74787400000000    // ".txt    "
+```
