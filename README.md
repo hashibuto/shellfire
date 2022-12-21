@@ -79,3 +79,4 @@ shellfire strencode [-s] <string>
 0x66696c656e616d65    // "filename"
 0x2e74787400000000    // ".txt    "
 ```
+Use the `-d` option to adjust the number of bits per grouping
