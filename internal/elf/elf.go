@@ -8,31 +8,34 @@ import (
 )
 
 const (
-	ElfHeaderSize32 = 52
-	ElfHeaderSize64 = 64
+	ElfHeaderSize32 = 0x34
+	ElfHeaderSize64 = 0x40
+
+	ProgramHeaderSize32 = 0x20
+	ProgramHeaderSize64 = 0x40
 )
 
 type ElfHeader struct {
-	EiMagic      []byte // 4 bytes
-	EiClass      byte
-	EiData       byte
-	EiVersion    byte
-	EiOsAbi      byte
-	EiAbiVersion byte
-	EiPad        []byte // 7 bytes
-	EType        uint16
-	EMachine     uint16
-	EVersion     uint32
-	EEntry       uint64 // 32 or 64
-	EPhOffset    uint64 // 32 or 64
-	EShOffset    uint64 // 32 or 64
-	Flags        []byte
-	EhSize       uint16
-	EPhEntSize   uint16
-	EPhNum       uint16
-	EShEntSize   uint16
-	EShNum       uint16
-	EShStrIndex  uint16
+	IMagic      []byte // 4 bytes
+	IClass      byte
+	IData       byte
+	IVersion    byte
+	IOsAbi      byte
+	IAbiVersion byte
+	IPad        []byte // 7 bytes
+	Type        uint16
+	Machine     uint16
+	Version     uint32
+	Entry       uint64 // 32 or 64
+	PhOffset    uint64 // 32 or 64
+	ShOffset    uint64 // 32 or 64
+	Flags       []byte
+	HSize       uint16
+	PhEntSize   uint16
+	PhNum       uint16
+	ShEntSize   uint16
+	ShNum       uint16
+	ShStrIndex  uint16
 }
 
 func LoadElfFile(data []byte) error {
@@ -61,8 +64,8 @@ func LoadElfFile(data []byte) error {
 	return nil
 }
 
-func (h *ElfHeader) Bits() int {
-	if h.EiClass == 1 {
+func (h *ElfHeader) ArchBits() int {
+	if h.IClass == 1 {
 		return 32
 	}
 
@@ -70,14 +73,17 @@ func (h *ElfHeader) Bits() int {
 }
 
 func (h *ElfHeader) ByteOrder() binary.ByteOrder {
-	if h.EiData == 1 {
+	if h.IData == 1 {
 		return binary.LittleEndian
 	}
 
 	return binary.BigEndian
 }
 
-func (h *ElfHeader) Unmarshal(data []byte) error {
+// NewElfHeader returns a new ELF header object from a byte array
+func NewElfHeader(data []byte) (*ElfHeader, error) {
+	h := &ElfHeader{}
+
 	b := data[5]
 	var order binary.ByteOrder
 	if b == 1 {
@@ -85,30 +91,30 @@ func (h *ElfHeader) Unmarshal(data []byte) error {
 	} else if b == 2 {
 		order = binary.BigEndian
 	} else {
-		return fmt.Errorf("Unknown endianness %d", b)
+		return nil, fmt.Errorf("Unknown endianness %d", b)
 	}
 
 	br := binreader.NewBinReader(data, order)
-	h.EiMagic, _ = br.ReadBytes(4)
-	if h.EiMagic[0] != 0x7f || h.EiMagic[1] != 'E' || h.EiMagic[2] != 'L' || h.EiMagic[3] != 'F' {
-		return fmt.Errorf("Magic number incorrect")
+	h.IMagic, _ = br.ReadBytes(4)
+	if h.IMagic[0] != 0x7f || h.IMagic[1] != 'E' || h.IMagic[2] != 'L' || h.IMagic[3] != 'F' {
+		return nil, fmt.Errorf("Magic number incorrect")
 	}
-	h.EiClass, _ = br.ReadByte()
-	if h.EiClass != 1 && h.EiClass != 2 {
-		return fmt.Errorf("Unknown architecture")
+	h.IClass, _ = br.ReadByte()
+	if h.IClass != 1 && h.IClass != 2 {
+		return nil, fmt.Errorf("Unknown architecture")
 	}
-	h.EiData, _ = br.ReadByte()
-	if h.EiData != 1 && h.EiData != 2 {
-		return fmt.Errorf("Unknown byte order")
+	h.IData, _ = br.ReadByte()
+	if h.IData != 1 && h.IData != 2 {
+		return nil, fmt.Errorf("Unknown byte order")
 	}
-	h.EiVersion, _ = br.ReadByte()
-	h.EiOsAbi, _ = br.ReadByte()
-	h.EiAbiVersion, _ = br.ReadByte()
-	h.EiPad, _ = br.ReadBytes(7)
-	h.EType, _ = br.ReadWord()
-	h.EMachine, _ = br.ReadWord()
-	h.EVersion, _ = br.ReadDWord()
-	if h.EiClass == 1 {
+	h.IVersion, _ = br.ReadByte()
+	h.IOsAbi, _ = br.ReadByte()
+	h.IAbiVersion, _ = br.ReadByte()
+	h.IPad, _ = br.ReadBytes(7)
+	h.Type, _ = br.ReadWord()
+	h.Machine, _ = br.ReadWord()
+	h.Version, _ = br.ReadDWord()
+	if h.IClass == 1 {
 		// 32 bit
 		var eentry uint32
 		var ephoff uint32
@@ -116,9 +122,9 @@ func (h *ElfHeader) Unmarshal(data []byte) error {
 		eentry, _ = br.ReadDWord()
 		ephoff, _ = br.ReadDWord()
 		eshoff, _ = br.ReadDWord()
-		h.EEntry = uint64(eentry)
-		h.EPhOffset = uint64(ephoff)
-		h.EShOffset = uint64(eshoff)
+		h.Entry = uint64(eentry)
+		h.PhOffset = uint64(ephoff)
+		h.ShOffset = uint64(eshoff)
 	} else {
 		// 64 bit
 		var eentry uint64
@@ -127,17 +133,23 @@ func (h *ElfHeader) Unmarshal(data []byte) error {
 		eentry, _ = br.ReadQWord()
 		ephoff, _ = br.ReadQWord()
 		eshoff, _ = br.ReadQWord()
-		h.EEntry = eentry
-		h.EPhOffset = ephoff
-		h.EShOffset = eshoff
+		h.Entry = eentry
+		h.PhOffset = ephoff
+		h.ShOffset = eshoff
 	}
 	h.Flags, _ = br.ReadBytes(4)
-	h.EhSize, _ = br.ReadWord()
-	h.EPhEntSize, _ = br.ReadWord()
-	h.EPhNum, _ = br.ReadWord()
-	h.EShEntSize, _ = br.ReadWord()
-	h.EShNum, _ = br.ReadWord()
-	h.EShStrIndex, _ = br.ReadWord()
+	h.HSize, _ = br.ReadWord()
+	h.PhEntSize, _ = br.ReadWord()
+	h.PhNum, _ = br.ReadWord()
+	h.ShEntSize, _ = br.ReadWord()
+	h.ShNum, _ = br.ReadWord()
+	h.ShStrIndex, _ = br.ReadWord()
+
+	return h, nil
+}
+
+func (h *ElfHeader) Unmarshal(data []byte) error {
+
 	return nil
 }
 
@@ -152,6 +164,41 @@ type ProgramHeader struct {
 	Align    uint64
 }
 
-func (h *ProgramHeader) Unmarshal(elfHeader *ElfHeader, data []byte) error {
+type programHeader32 struct {
+	Type     uint32
+	Flags    []byte // 4 bytes
+	Offset   uint32
+	VAddr    uint32
+	PAddr    uint32
+	FileSize uint32
+	MemSize  uint32
+	Align    uint32
+}
 
+func NewProgramHeader(elfHeader *ElfHeader, data []byte) (*ProgramHeader, error) {
+	br := binreader.NewBinReader(data, elfHeader.ByteOrder())
+
+	h := &ProgramHeader{}
+	if elfHeader.ArchBits() == 32 {
+		mh := &programHeader32{}
+		mh.Type, _ = br.ReadDWord()
+		mh.Offset, _ = br.ReadDWord()
+		mh.VAddr, _ = br.ReadDWord()
+		mh.PAddr, _ = br.ReadDWord()
+		mh.FileSize, _ = br.ReadDWord()
+		mh.MemSize, _ = br.ReadDWord()
+		mh.Flags, _ = br.ReadBytes(4)
+		mh.Align, _ = br.ReadDWord()
+	} else {
+		h.Type, _ = br.ReadQWord()
+		h.Flags, _ = br.ReadBytes(8)
+		h.Offset, _ = br.ReadQWord()
+		h.VAddr, _ = br.ReadQWord()
+		h.PAddr, _ = br.ReadQWord()
+		h.FileSize, _ = br.ReadQWord()
+		h.MemSize, _ = br.ReadQWord()
+		h.Align, _ = br.ReadQWord()
+	}
+
+	return h, nil
 }
