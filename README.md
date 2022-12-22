@@ -9,7 +9,7 @@ wget -O /tmp/shellfire https://github.com/hashibuto/shellfire/releases/download/
 
 ## Buffer overflow return address pattern tool
 
-Create a pattern of n bytes
+Create a non-repeating pattern of n bytes
 
 `shellfire pattern create <num_bytes>`
 
